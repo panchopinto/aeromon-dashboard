@@ -1,105 +1,30 @@
-# SIAMP — Dashboard (Google Sheets → Gráfico)
+# AEROMON — Dashboard (Google Sheets → Gráfico)
 
-Panel web para visualizar **Temperatura del aire**, **Humedad**, **Temperatura del agua** y **Eventos de Alimentación** desde una Google Sheet (Hoja1).
+Panel web que lee **Temperatura** y **Humedad** desde una Google Sheet (Hoja1) y permite filtrar por **Año, Mes, Día, Hora y Minuto**, además de **promediar por hora**.
 
-## Conectar con tu Google Sheet
-1. Hoja > **Archivo → Compartir → Publicar en la web**.
-2. Verifica que la pestaña sea **Hoja1** o ajusta `js/config.js`.
-3. Edita `js/config.js` con tu URL CSV.
-
-## Funciones
-- Filtros por **Año, Mes, Día, Hora y Minuto**.
-- Botones rápidos: **Hoy**, **Últimas 24h**, **Todo**, **Promediar por hora**.
-- Botones para mostrar/ocultar cada serie.
-- Marcadores **scatter** para `¿Alimentó?` (puntos en el gráfico).
-- KPIs: última lectura, temp aire, humedad, temp agua y conteo de alimentaciones del día.
-
-## Deploy GitHub Pages
-Publica el repo y activa Pages para servir `index.html`.
-
-
----
-
-## 🔔 Notificaciones de alerta
-
-Puedes enviar alertas cuando la **Temperatura del Agua** salga del rango.
-
-### Opción A) EmailJS (sin servidor)
-1. Crea una cuenta en **EmailJS** y configura un **Service** + **Template**.
-2. En `js/config.js` completa:
+## 🔗 Conectar con tu Google Sheet
+1. Abre tu hoja > **Archivo → Compartir → Publicar en la web**.
+2. Asegúrate de que la pestaña se llame **Hoja1** o ajusta `config.js`.
+3. Usa la URL CSV en `config.js`:
    ```js
-   ALERTS: {
-     ENABLED: true,
-     COOLDOWN_MINUTES: 10,
-     PROVIDERS: {
-       EMAILJS: {
-         ENABLED: true,
-         PUBLIC_KEY: "TU_PUBLIC_KEY",
-         SERVICE_ID: "TU_SERVICE_ID",
-         TEMPLATE_ID: "TU_TEMPLATE_ID",
-         TO_EMAIL: "destino@correo.com",
-         FROM_NAME: "SIAMP Dashboard"
-       }
-     }
+   const CONFIG = {
+     SHEET_URL: "https://docs.google.com/spreadsheets/d/ID/gviz/tq?tqx=out:csv&sheet=Hoja1"
    }
    ```
-3. El template puede usar variables como: `subject`, `message`, `tempWater`, etc.
 
-### Opción B) Webhook (WhatsApp con Twilio a través de Cloudflare Workers)
-1. Crea un **Cloudflare Worker** y pega algo similar a:
-   ```js
-   export default {
-     async fetch(req, env) {
-       if (req.method !== "POST") return new Response("Only POST", { status: 405 });
-       const body = await req.json();
-       const { message, context } = body;
+## 🚀 Deploy en GitHub Pages
+- Sube toda la carpeta a un repo, por ejemplo `AEROMON_Dashboard`.
+- En **Settings → Pages**, publica la rama `main` con carpeta `/root`.
+- Abre `https://tuusuario.github.io/AEROMON_Dashboard/`
 
-       const accountSid = env.TWILIO_SID;
-       const authToken  = env.TWILIO_TOKEN;
-       const fromWhats  = env.TWILIO_WHATSAPP_FROM; // ej: "whatsapp:+14155238886"
-       const toWhats    = env.TO_WHATSAPP;          // ej: "whatsapp:+569XXXXXXXX"
+## 🧩 Librerías
+- PapaParse
+- Chart.js
+- Day.js (con `customParseFormat`)
 
-       const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
-       const msg = `${message} | Agua: ${context?.tempWater || "?"}°C`;
+## 📝 Columnas esperadas
+- `Fecha / Hora`
+- `Temperatura Ambiente (ºC)`
+- `Humedad Ambiente  (%)`
+- `DIA` `MES` `AÑO` `HORA` `MINUTOS`
 
-       const data = new URLSearchParams();
-       data.append("From", fromWhats);
-       data.append("To", toWhats);
-       data.append("Body", msg);
-
-       const resp = await fetch(url, {
-         method: "POST",
-         headers: {
-           "Authorization": "Basic " + btoa(`${accountSid}:${authToken}`),
-           "Content-Type": "application/x-www-form-urlencoded"
-         },
-         body: data
-       });
-       const out = await resp.text();
-       return new Response(out, { status: resp.status });
-     }
-   }
-   ```
-2. Define variables de entorno en el Worker: `TWILIO_SID`, `TWILIO_TOKEN`, `TWILIO_WHATSAPP_FROM`, `TO_WHATSAPP`.
-3. En `js/config.js` activa el **WEBHOOK** con la URL del Worker:
-   ```js
-   WEBHOOK: { ENABLED: true, URL: "https://tu-worker.cloudflare.workers.dev/notify" }
-   ```
-
-### Prueba rápida
-- En el panel, usa el botón **“Probar notificación”** para enviar un mensaje de test.
-- Hay **anti‑spam** por contenido y tiempo (cooldown configurable).
-
-
-### ✏️ Umbrales en vivo (persistentes)
-En la sección de filtros verás **Umbral agua (mín/máx)** y **Modo de alerta**.
-- Pulsa **Guardar umbrales** para aplicar y persistir en `localStorage`.
-- **Restablecer** vuelve a los valores por defecto de `config.js`.
-- Los cambios actualizan de inmediato el KPI, el banner y las **líneas de umbral** del gráfico principal.
-
-
-## ✅ Mejoras añadidas
-- **Persistencia de estado**: series visibles, filtros, promedio por hora y banda min–max.
-- **Alertas con histéresis** y tiempo mínimo de permanencia antes de notificar.
-- **Pan & Zoom** en el gráfico principal + botón **Reset Zoom**.
-- **Historial de alertas** con nivel (warning/critical), mensaje, valor y timestamp (guardado en `localStorage`).
