@@ -16,7 +16,7 @@
 
   <!-- Auto Refresh Toggle (1 min) -->
   <style>
-    .auto-refresh { display:flex; align-items:center; gap:.5rem; }
+    .auto-refresh { display:flex; align-items:center; gap:.5rem; margin-left:auto; }
     .auto-refresh .label { font-size:.95rem; opacity:.85; }
     .badge { font-size:.85rem; padding:.15rem .5rem; border-radius:.5rem; border:1px solid rgba(0,0,0,.08); }
     .badge.on { background:rgba(34,197,94,.15); }
@@ -27,8 +27,7 @@
     .slider:before { position:absolute; content:""; height:22px; width:22px; left:3px; bottom:3px; background:#fff; transition:.2s; border-radius:50%; box-shadow: 0 1px 2px rgba(0,0,0,.25); }
     input:checked + .slider { background:linear-gradient(90deg, #22c55e, #16a34a); }
     input:checked + .slider:before { transform: translateX(24px); }
-    .topbar .header-actions { margin-left:auto; display:flex; align-items:center; gap:.75rem; }
-    .topbar .header-actions .actions { display:flex; gap:.5rem; }
+    @media (max-width: 640px) { .auto-refresh { margin-left:0; } }
   </style>
   <script defer src="js/auto-refresh.js"></script>
 
@@ -59,11 +58,9 @@
       </svg>
       <div>
         <h1>AEROMON — Panel</h1>
-        <small>Temperatura & Humedad desde Google Sheets (Hoja1)</small>
+        <small>Temperatura & Humedad desde Google Sheet </small>
       </div>
     </div>
-    <div class="header-actions">
-
     <nav class="actions">
       <button class="btn ghost" id="btnShowTemp">
         <span class="icon">
@@ -83,21 +80,19 @@
         </span>
         Promediar por hora
       </button>
+    
+      <div class="auto-refresh" title="Actualizar la página automáticamente cada 1 minuto">
+        <span class="label">Auto-actualizar</span>
+        <label class="switch">
+          <input type="checkbox" id="autoRefreshToggle" aria-label="Auto-actualizar cada 1 minuto"/>
+          <span class="slider round"></span>
+        </label>
+        <span id="autoRefreshStatus" class="badge off">OFF</span>
+      </div>
+
     </nav>
-
-    </div>
-
   
-    <div class="auto-refresh" title="Actualizar la página automáticamente cada 1 minuto">
-      <span class="label">Auto-actualizar</span>
-      <label class="switch">
-        <input type="checkbox" id="autoRefreshToggle" aria-label="Auto-actualizar cada 1 minuto"/>
-        <span class="slider round"></span>
-      </label>
-      <span id="autoRefreshStatus" class="badge off">OFF</span>
-    </div>
-
-</header>
+    </header>
 
   <main class="container">
     <section class="filters glass">
