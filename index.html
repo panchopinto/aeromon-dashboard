@@ -58,7 +58,7 @@
       </svg>
       <div>
         <h1>AEROMON — Panel</h1>
-        <small>Temperatura & Humedad desde Google Sheets (Hoja1)</small>
+        <small>Temperatura & Humedad desde Google Sheet </small>
       </div>
     </div>
     <nav class="actions">
@@ -80,18 +80,19 @@
         </span>
         Promediar por hora
       </button>
+    
+      <div class="auto-refresh" title="Actualizar la página automáticamente cada 1 minuto">
+        <span class="label">Auto-actualizar</span>
+        <label class="switch">
+          <input type="checkbox" id="autoRefreshToggle" aria-label="Auto-actualizar cada 1 minuto"/>
+          <span class="slider round"></span>
+        </label>
+        <span id="autoRefreshStatus" class="badge off">OFF</span>
+      </div>
+
     </nav>
   
-    <div class="auto-refresh" title="Actualizar la página automáticamente cada 1 minuto">
-      <span class="label">Auto-actualizar</span>
-      <label class="switch">
-        <input type="checkbox" id="autoRefreshToggle" aria-label="Auto-actualizar cada 1 minuto"/>
-        <span class="slider round"></span>
-      </label>
-      <span id="autoRefreshStatus" class="badge off">OFF</span>
-    </div>
-
-</header>
+    </header>
 
   <main class="container">
     <section class="filters glass">
