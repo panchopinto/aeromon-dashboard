@@ -13,6 +13,24 @@
   <script>dayjs.extend(dayjs_plugin_customParseFormat)</script>
   <script defer src="js/config.js"></script>
   <script defer src="js/app.js"></script>
+
+  <!-- Auto Refresh Toggle (1 min) -->
+  <style>
+    .auto-refresh { display:flex; align-items:center; gap:.5rem; margin-left:auto; }
+    .auto-refresh .label { font-size:.95rem; opacity:.85; }
+    .badge { font-size:.85rem; padding:.15rem .5rem; border-radius:.5rem; border:1px solid rgba(0,0,0,.08); }
+    .badge.on { background:rgba(34,197,94,.15); }
+    .badge.off { background:rgba(107,114,128,.15); }
+    .switch { position:relative; display:inline-block; width:52px; height:28px; }
+    .switch input { opacity:0; width:0; height:0; }
+    .slider { position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background:#a3a3a3; transition:.2s; border-radius:999px; box-shadow: inset 0 0 0 2px rgba(0,0,0,.06); }
+    .slider:before { position:absolute; content:""; height:22px; width:22px; left:3px; bottom:3px; background:#fff; transition:.2s; border-radius:50%; box-shadow: 0 1px 2px rgba(0,0,0,.25); }
+    input:checked + .slider { background:linear-gradient(90deg, #22c55e, #16a34a); }
+    input:checked + .slider:before { transform: translateX(24px); }
+    @media (max-width: 640px) { .auto-refresh { margin-left:0; } }
+  </style>
+  <script defer src="js/auto-refresh.js"></script>
+
 </head>
 <body>
   <header class="topbar glass">
@@ -63,7 +81,17 @@
         Promediar por hora
       </button>
     </nav>
-  </header>
+  
+    <div class="auto-refresh" title="Actualizar la página automáticamente cada 1 minuto">
+      <span class="label">Auto-actualizar</span>
+      <label class="switch">
+        <input type="checkbox" id="autoRefreshToggle" aria-label="Auto-actualizar cada 1 minuto"/>
+        <span class="slider round"></span>
+      </label>
+      <span id="autoRefreshStatus" class="badge off">OFF</span>
+    </div>
+
+</header>
 
   <main class="container">
     <section class="filters glass">
