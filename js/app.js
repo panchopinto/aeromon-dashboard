@@ -34,8 +34,9 @@ function toggleActive(selector, isActive){
   el.style.opacity = isActive ? '1' : '0.7';
 }
 
+function getSheetUrl(){ try { return CONFIG.SHEET_URL + (CONFIG.SHEET_URL.includes('?') ? '&' : '?') + '_ts=' + Date.now(); } catch(e){ return CONFIG.SHEET_URL; } }
 function loadData(){
-  Papa.parse(CONFIG.SHEET_URL, {
+  Papa.parse(getSheetUrl(), {
     download:true, header:true, dynamicTyping:false, skipEmptyLines:true,
     complete: (res)=>{
       rawRows = res.data.map(cleanRow).filter(r => r && !isNaN(r.temp) && !isNaN(r.hum));
@@ -216,21 +217,30 @@ function renderChart(){
   });
 }
 
+
 function groupByHour(rows){
   const map = new Map();
   rows.forEach(r=>{
-    const key = dayjs(r.date).format('YYYY-MM-DD HH:00');
-    if(!map.has(key)) map.set(key, {temps:[], hums:[], date: dayjs(r.date).startOf('hour')});
-    const obj = map.get(key);
+    const hourKey = dayjs(r.date).format('YYYY-MM-DD HH:00');
+    if(!map.has(hourKey)) map.set(hourKey, {temps:[], hums:[], first: dayjs(r.date).startOf('hour'), last: dayjs(r.date)});
+    const obj = map.get(hourKey);
     obj.temps.push(r.temp);
     obj.hums.push(r.hum);
+    // guarda la hora real del último dato visto en ese bucket
+    obj.last = dayjs(r.date);
   });
   const out = [];
   for(const [key, v] of map){
     const tavg = v.temps.reduce((a,b)=>a+b,0)/v.temps.length;
     const havg = v.hums.reduce((a,b)=>a+b,0)/v.hums.length;
-    out.push({label: dayjs(v.date).format('DD/MM/YYYY HH:mm'), temp: tavg, hum: havg, date: v.date.toDate()});
+    // etiqueta usando la hora/min del último dato del bucket (más intuitivo)
+    const labelTime = v.last.format('DD/MM/YYYY HH:mm');
+    out.push({label: labelTime, temp: tavg, hum: havg, date: v.last.toDate()});
   }
+  out.sort((a,b)=> a.date - b.date);
+  return out;
+}
+
   out.sort((a,b)=> a.date - b.date);
   return out;
 }
