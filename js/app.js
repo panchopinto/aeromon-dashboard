@@ -226,21 +226,18 @@ function groupByHour(rows){
     const obj = map.get(hourKey);
     obj.temps.push(r.temp);
     obj.hums.push(r.hum);
-    // guarda la hora real del último dato visto en ese bucket
     obj.last = dayjs(r.date);
   });
   const out = [];
   for(const [key, v] of map){
     const tavg = v.temps.reduce((a,b)=>a+b,0)/v.temps.length;
     const havg = v.hums.reduce((a,b)=>a+b,0)/v.hums.length;
-    // etiqueta usando la hora/min del último dato del bucket (más intuitivo)
     const labelTime = v.last.format('DD/MM/YYYY HH:mm');
     out.push({label: labelTime, temp: tavg, hum: havg, date: v.last.toDate()});
   }
   out.sort((a,b)=> a.date - b.date);
   return out;
 }
-
   out.sort((a,b)=> a.date - b.date);
   return out;
 }
